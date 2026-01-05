@@ -363,7 +363,7 @@ class PreprocessThreadedStage(ThreadedPipelineStage):
                         assert isinstance(backend, PdfDocumentBackend), (
                             "Threaded pipeline only supports PdfDocumentBackend."
                         )
-                        page_backend = backend.load_page(page.page_no)
+                        page_backend = backend.load_page(page.page_no - 1)
                         page._backend = page_backend
                         if page_backend.is_valid():
                             page.size = page_backend.get_size()
@@ -587,7 +587,7 @@ class StandardPdfPipeline(ConvertPipeline):
         pages: list[Page] = []
         for i in range(conv_res.input.page_count):
             if start_page - 1 <= i <= end_page - 1:
-                page = Page(page_no=i)
+                page = Page(page_no=i + 1)
                 conv_res.pages.append(page)
                 pages.append(page)
 
@@ -701,7 +701,7 @@ class StandardPdfPipeline(ConvertPipeline):
         ]
         # Add error details from failed pages
         for page_no, error in proc.failed_pages:
-            page_label = f"Page {page_no + 1}" if page_no >= 0 else "Unknown page"
+            page_label = f"Page {page_no}" if page_no > 0 else "Unknown page"
             error_msg = str(error) if error else ""
             error_item = ErrorItem(
                 component_type=DoclingComponentType.PIPELINE,
@@ -746,7 +746,7 @@ class StandardPdfPipeline(ConvertPipeline):
             if self.pipeline_options.generate_page_images:
                 for page in conv_res.pages:
                     assert page.image is not None
-                    page_no = page.page_no + 1
+                    page_no = page.page_no
                     conv_res.document.pages[page_no].image = ImageRef.from_pil(
                         page.image, dpi=int(72 * self.pipeline_options.images_scale)
                     )
