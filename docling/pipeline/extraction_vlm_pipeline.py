@@ -159,11 +159,11 @@ class ExtractionVlmPipeline(BaseExtractionPipeline):
                 f"Processing pages {start_page}-{end_page} of {page_count} total pages for extraction"
             )
 
-            for page_num in range(page_count):
-                # Only process pages within the specified range (0-based indexing)
-                if start_page - 1 <= page_num <= end_page - 1:
+            for page_no in range(1, page_count + 1):
+                # Only process pages within the specified range (1-based indexing)
+                if start_page <= page_no <= end_page:
                     try:
-                        page_backend = backend.load_page(page_num)
+                        page_backend = backend.load_page(page_no - 1)
                         if page_backend.is_valid():
                             # Get page image at a reasonable scale
                             page_image = page_backend.get_page_image(
@@ -171,9 +171,9 @@ class ExtractionVlmPipeline(BaseExtractionPipeline):
                             )
                             images.append(page_image)
                         else:
-                            _log.warning(f"Page {page_num + 1} backend is not valid")
+                            _log.warning(f"Page {page_no} backend is not valid")
                     except Exception as e:
-                        _log.error(f"Error loading page {page_num + 1}: {e}")
+                        _log.error(f"Error loading page {page_no}: {e}")
 
         except Exception as e:
             _log.error(f"Error getting images from input document: {e}")

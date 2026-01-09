@@ -585,9 +585,9 @@ class StandardPdfPipeline(ConvertPipeline):
         # Collect page placeholders; backends are loaded lazily in preprocess stage
         start_page, end_page = conv_res.input.limits.page_range
         pages: list[Page] = []
-        for i in range(conv_res.input.page_count):
-            if start_page - 1 <= i <= end_page - 1:
-                page = Page(page_no=i + 1)
+        for page_no in range(1, conv_res.input.page_count + 1):
+            if start_page <= page_no <= end_page:
+                page = Page(page_no=page_no)
                 conv_res.pages.append(page)
                 pages.append(page)
 
